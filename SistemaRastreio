@@ -1,0 +1,89 @@
+# Sistema Simples de Rastreamento de Encomendas (Parcel Track System)
+import datetime
+
+# Banco de dados simulado em memória
+sistema_rastreio = {}
+
+def criar_encomenda(codigo, destino):
+    if codigo in sistema_rastreio:
+        print(f"\n[Erro] O código {codigo} já está cadastrado.")
+        return
+    
+    timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+    sistema_rastreio[codigo] = {
+        "destino": destino,
+        "status": "Objeto postado",
+        "historico": [f"[{timestamp}] Objeto postado - Destino: {destino}"]
+    }
+    print(f"\n[Sucesso] Encomenda {codigo} criada com sucesso!")
+
+def atualizar_status(codigo, novo_status):
+    if codigo not in sistema_rastreio:
+        print(f"\n[Erro] Encomenda {codigo} não encontrada.")
+        return
+    
+    timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
+    sistema_rastreio[codigo]["status"] = novo_status
+    sistema_rastreio[codigo]["historico"].append(f"[{timestamp}] {novo_status}")
+    print(f"\n[Sucesso] Status da encomenda {codigo} atualizado.")
+
+def consultar_encomenda(codigo):
+    if codigo not in sistema_rastreio:
+        print(f"\n[Erro] Encomenda {codigo} não encontrada.")
+        return
+    
+    encomenda = sistema_rastreio[codigo]
+    print(f"\n" + "="*40)
+    print(f"CÓDIGO DE RASTREIO: {codigo}")
+    print(f"DESTINO: {encomenda['destino']}")
+    print(f"STATUS ATUAL: {encomenda['status']}")
+    print("="*40)
+    print("HISTÓRICO DE MOVIMENTAÇÃO:")
+    for evento in encomenda["historico"]:
+        print(f" - {evento}")
+    print("="*40)
+
+def menu():
+    # Exemplo inicial pré-carregado para testes
+    criar_encomenda("BR123456789X", "São Paulo - SP")
+    atualizar_status("BR123456789X", "Em trânsito para a unidade de triagem")
+    
+    while True:
+        print("\n=== SISTEMA DE RASTREAMENTO SIMPLES ===")
+        print("1. Cadastrar Nova Encomenda")
+        print("2. Atualizar Status de Encomenda")
+        print("3. Consultar Encomenda")
+        print("4. Sair")
+        
+        opcao = input("Escolha uma opção (1-4): ").strip()
+        
+        if opcao == "1":
+            codigo = input("Digite o código de rastreio: ").strip().upper()
+            destino = input("Digite a cidade/destino final: ").strip()
+            if codigo and destino:
+                criar_encomenda(codigo, destino)
+                
+        elif opcao == "2":
+            codigo = input("Digite o código de rastreio: ").strip().upper()
+            print("1 - Em trânsito\n2 - Saiu para entrega\n3 - Entregue")
+            escolha = input("Opção: ").strip()
+            
+            status_map = {
+                "1": "Em trânsito para o centro de distribuição",
+                "2": "Objeto saiu para entrega ao destinatário",
+                "3": "Objeto entregue com sucesso"
+            }
+            status = status_map.get(escolha)
+            if codigo and status:
+                atualizar_status(codigo, status)
+                
+        elif opcao == "3":
+            codigo = input("Digite o código de rastreio: ").strip().upper()
+            consultar_encomenda(codigo)
+            
+        elif opcao == "4":
+            print("\nEncerrando o sistema. Até logo!")
+            break
+
+if __name__ == "__main__":
+    menu()
